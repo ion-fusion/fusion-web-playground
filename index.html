@@ -4,6 +4,12 @@
     <meta charset="utf-8" />
     <title>Trunk Template</title>
     <link data-trunk rel="sass" href="index.scss" />
+    <!-- Import CheerpJ for running Java code -->
+    <script src="https://cjrtnc.leaningtech.com/4.0/loader.js"></script>
+    <!-- Temporary, scrappy solution just for proof-of-concept purposes to build the page -->
+    <!-- These files should eventually be retrieved as part of the build process instead of checked-in with LFS -->
+    <link data-trunk rel="copy-file" href="fusion-java.jar" />
+    <link data-trunk rel="copy-file" href="ion-java.jar" />
   </head>
   <body></body>
 </html>

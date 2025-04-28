@@ -1,4 +1,5 @@
 mod app;
+mod fusion_runtime;
 
 use app::App;
 
