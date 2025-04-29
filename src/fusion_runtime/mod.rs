@@ -14,7 +14,9 @@ extern "C" {
     #[wasm_bindgen(catch)]
     pub async fn fusion_eval(
         lib: &Classloader,
-        runtime: Runtime,
+        runtime: &Runtime,
         expr: String,
     ) -> Result<JsValue, JsValue>;
 }
+
+// TODO: move these functions to private and expose a public interface that handles JsValue marshalling

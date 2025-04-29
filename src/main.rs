@@ -1,8 +1,8 @@
-mod app;
 mod fusion_runtime;
+mod fusion_sandbox;
 
-use app::App;
+use fusion_sandbox::FusionSandbox;
 
 fn main() {
-    yew::Renderer::<App>::new().render();
+    yew::Renderer::<FusionSandbox>::new().render();
 }
