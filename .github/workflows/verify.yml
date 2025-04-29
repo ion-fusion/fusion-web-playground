@@ -1,0 +1,38 @@
+name: Pull Request Checks
+
+on:
+  pull_request:
+    paths-ignore:
+      - "**.md"
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+          components: clippy, rustfmt
+      - uses: jetli/trunk-action@v0.5.0
+      - name: Cache Cargo registry
+        uses: actions/cache@v4
+        continue-on-error: false
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+      - name: Cache build artifacts
+        uses: actions/cache@v4
+        with:
+          path: target
+          key: ${{ runner.os }}-cargo-build-artifacts-${{ hashFiles('**/Cargo.lock') }}
+      - name: Test
+        run: cargo test
+      - name: Lint
+        run: cargo fmt -- --check
+      - name: Clippy
+        run: cargo clippy -- -D warnings --no-deps
+      - name: Build
+        run: trunk build
