@@ -36,3 +36,5 @@ jobs:
         run: cargo clippy -- -D warnings --no-deps
       - name: Build
         run: trunk build
+      - name: Dependency Check
+        uses: actions/dependency-review-action@v4
