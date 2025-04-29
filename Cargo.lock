@@ -109,6 +109,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "fusion-web-playground"
+version = "0.1.0"
+dependencies = [
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
+ "yew",
+]
+
+[[package]]
 name = "futures"
 version = "0.3.31"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1001,13 +1011,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e672c95779cf947c5311f83787af4fa8fffd12fb27e4993211a84bdfd9610f9c"
 dependencies = [
  "once_cell",
-]
-
-[[package]]
-name = "fusion-web-playground"
-version = "0.1.0"
-dependencies = [
- "yew",
 ]
 
 [[package]]
