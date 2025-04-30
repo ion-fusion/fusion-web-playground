@@ -93,6 +93,7 @@ impl Component for FusionSandbox {
     /// Called on initial `create` and any time `update` returns true for re-rendering
     fn view(&self, ctx: &Context<Self>) -> Html {
         if let Some(error) = &self.runtime_error {
+            log::error!("{error}");
             html! {
                 <main>
                     <h1>{ "Unexpected Runtime Error" }</h1>
