@@ -1,15 +1,15 @@
-export async function create_classloader() {
+export async function js_create_classloader() {
     await cheerpjInit();
     return await cheerpjRunLibrary("/app/fusion-java.jar:/app/ion-java.jar");
 }
 
-export async function create_fusion_runtime(classloader) {
+export async function js_create_fusion_runtime(classloader) {
     const FusionRuntimeBuilder = await classloader.dev.ionfusion.fusion.FusionRuntimeBuilder;
     const standardRuntimeBuilder = await FusionRuntimeBuilder.standard();
     return await standardRuntimeBuilder.build();
 }
 
-export async function fusion_eval(classloader, runtime, expr) {
+export async function js_fusion_eval(classloader, runtime, expr) {
     const sandboxBuilder = await runtime.makeSandboxBuilder();
     await sandboxBuilder.setLanguage("/fusion");
     const toplevel = await sandboxBuilder.build();

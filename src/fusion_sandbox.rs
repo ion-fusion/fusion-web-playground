@@ -42,7 +42,7 @@ impl Component for FusionSandbox {
         ctx.link().send_future(async {
             match fusion_runtime::create_classloader().await {
                 Ok(classloader) => SandboxMsg::ClassloaderReady(classloader),
-                Err(js) => SandboxMsg::RuntimeError(js.as_string().unwrap_or_default()),
+                Err(err) => SandboxMsg::RuntimeError(err),
             }
         });
 
@@ -58,7 +58,7 @@ impl Component for FusionSandbox {
                 ctx.link().send_future(async move {
                     match fusion_runtime::create_fusion_runtime(&refcounted).await {
                         Ok(runtime) => SandboxMsg::RuntimeReady(runtime),
-                        Err(js) => SandboxMsg::RuntimeError(js.as_string().unwrap_or_default()),
+                        Err(err) => SandboxMsg::RuntimeError(err),
                     }
                 });
                 false // No need to re-render at this point
@@ -71,12 +71,9 @@ impl Component for FusionSandbox {
                 let classloader = self.classloader.clone().expect("A classloader must exist");
                 let runtime = self.runtime.clone().expect("A runtime must exist");
                 ctx.link().send_future(async move {
-                    let result = fusion_runtime::fusion_eval(&classloader, &runtime, expr)
-                        .await
-                        .map(|output| output.as_string().unwrap_or_default())
-                        .map_err(|e| e.as_string().unwrap_or_default());
-
-                    SandboxMsg::FusionResult(result)
+                    SandboxMsg::FusionResult(
+                        fusion_runtime::fusion_eval(&classloader, &runtime, expr).await,
+                    )
                 });
                 false // No spinner or anything for waiting on evaluation for now, but if we had one this would be true
             }
