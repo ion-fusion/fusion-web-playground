@@ -1,3 +1,4 @@
+mod code_input;
 mod fusion_runtime;
 mod fusion_sandbox;
 
