@@ -1,0 +1,16 @@
+[[hooks]]
+stage = "pre_build"
+command = "mvn"
+command_arguments = [
+   "dependency:copy",
+   "-Dartifact=com.amazon.ion:ion-java:1.11.9",
+   "-Dmdep.stripVersion=true",
+   "-DoutputDirectory=.",
+]
+
+# TODO: Download Fusion Java: https://github.com/ion-fusion/fusion-web-playground/issues/9
+
+[[hooks]]
+stage = "post_build"
+command = "rm"
+command_arguments = ["ion-java.jar"]
