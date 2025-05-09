@@ -1,10 +1,11 @@
 use std::rc::Rc;
 
-use wasm_bindgen::JsCast;
-use web_sys::HtmlInputElement;
-use yew::{html, Component, Context, Html, MouseEvent, Properties, TargetCast};
+use yew::{html, Component, Context, Html, Properties};
 
-use crate::fusion_runtime::{self, Classloader, Runtime};
+use crate::{
+    code_input::CodeInput,
+    fusion_runtime::{self, Classloader, Runtime},
+};
 
 /// The component's internal state is maintained by values here.
 #[derive(Default)]
@@ -101,39 +102,26 @@ impl Component for FusionSandbox {
                 </main>
             }
         } else if self.runtime.is_some() {
-            let onclick = ctx.link().callback(|event: MouseEvent| {
-                let input: HtmlInputElement = event.target_unchecked_into();
-
-                input
-                    .owner_document()
-                    .and_then(|document| document.get_element_by_id("fusion-script"))
-                    .and_then(|element| {
-                        element
-                            .dyn_into::<HtmlInputElement>()
-                            .map(|text_input| text_input.value())
-                            .ok()
-                    })
-                    .map_or(
-                        SandboxMsg::RuntimeError("Could not parse input".to_owned()),
-                        SandboxMsg::Invoke,
-                    )
-            });
+            let on_submit = ctx.link().callback(|code: String| SandboxMsg::Invoke(code));
 
             html! {
                 <main>
                     <h1>{ "Fusion is ready!" }</h1>
-                    <input id="fusion-script"/>
-                    <button {onclick}>{ "Evaluate" }</button>
+                    <CodeInput {on_submit}/>
+                    <br/>
                     {
                         if let Some(result) = &self.fusion_result {
-                            match result {
-                                Ok(output) => html! {
-                                        <span class="subtitle">{ "Your result is: " }{ output }</span>
-                                    },
-                                    Err(err) => html! {
-                                        <span class="subtitle">{ "Your expression produced an error: "}{ err }</span>
-                                    },
-                                }
+                            let (message, content) = match result {
+                                Ok(output) => ("Your result is: ", output),
+                                Err(err) => ("Your expression produced an error: ", err),
+                            };
+                            html! {
+                                <div>
+                                    <span class="subtitle">{message}</span>
+                                    <br/>
+                                    <span class="monospaced">{content}</span>
+                                </div>
+                            }
                         } else {
                             html! {
                                 <span/>
