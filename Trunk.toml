@@ -9,8 +9,3 @@ command_arguments = [
 ]
 
 # TODO: Download Fusion Java: https://github.com/ion-fusion/fusion-web-playground/issues/9
-
-[[hooks]]
-stage = "post_build"
-command = "rm"
-command_arguments = ["ion-java.jar"]
