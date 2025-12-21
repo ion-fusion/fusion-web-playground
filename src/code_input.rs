@@ -8,6 +8,7 @@ use yew::{
 
 const INPUT_ID: &str = "code-input-content";
 const LINE_NUM_ID: &str = "line-numbers";
+const INPUT_EVENT_TYPE: &str = "input";
 
 #[derive(Properties, PartialEq)]
 pub struct CodeInputProps {
@@ -81,7 +82,7 @@ fn line_numbers_callback(new_lines: UseStateHandle<Vec<LineNumber>>) -> Callback
 
 #[function_component]
 pub fn CodeInput(props: &CodeInputProps) -> Html {
-    let onclick = &props.on_submit.reform(|event: MouseEvent| {
+    let onclick_eval = &props.on_submit.reform(|event: MouseEvent| {
         let element: HtmlElement = event.target_unchecked_into();
         let code = element
             .owner_document()
@@ -105,6 +106,38 @@ pub fn CodeInput(props: &CodeInputProps) -> Html {
 
     let lines = use_state_eq(|| vec![LineNumber::Present(1)]);
     let oninput = line_numbers_callback(lines.clone());
+
+    let fmt_config = fuusak::config::new_default_config();
+    let onclick_fmt = Callback::from(move |event: MouseEvent| {
+        let element: HtmlElement = event.target_unchecked_into();
+        let code = element
+            .owner_document()
+            .and_then(|document| document.get_element_by_id(INPUT_ID))
+            .and_then(|element| element.dyn_into::<HtmlTextAreaElement>().ok());
+
+        let Some(original) = code else {
+            error!("Failed to get input from {INPUT_ID} in the DOM");
+            return;
+        };
+
+        let formatted = match fuusak::parser::parse_str(&original.value(), &fmt_config) {
+            Ok(ast) => fuusak::format::format(&fmt_config, &ast),
+            Err(parse_err) => {
+                // TODO: this should be surfaced to the user not in the console
+                error!("Failed to parse code for formatting: {parse_err}");
+                original.value()
+            }
+        };
+        original.set_value(&formatted);
+
+        // Emit an input event to trigger line number recomputation
+        if InputEvent::new(INPUT_EVENT_TYPE)
+            .and_then(|event| original.dispatch_event(&event))
+            .is_err()
+        {
+            error!("Unable to dispatch input event after formatting");
+        }
+    });
 
     html! {
         <div>
@@ -133,7 +166,8 @@ pub fn CodeInput(props: &CodeInputProps) -> Html {
                     spellcheck="false"/>
                 <br/>
             </div>
-            <button {onclick}>{ "Evaluate" }</button>
+            <button onclick={onclick_eval}>{ "Evaluate" }</button>
+            <button onclick={onclick_fmt}>{ "Format" }</button>
         </div>
     }
 }
